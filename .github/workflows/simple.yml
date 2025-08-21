@@ -1,0 +1,23 @@
+name: Simple CI Workflow
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  simple-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run a simple script
+        run: echo "Hello, this is a simple workflow running at $(date)"
+
+      - name: Push metric to Prometheus
+        run: |
+          # Just send a "1" to Prometheus to show workflow ran
+          curl -X POST \
+            --data "workflow_run_total 1" \
+            http://<YOUR_PUSHGATEWAY_HOST>:9091/metrics/job/github_actions
