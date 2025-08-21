@@ -18,6 +18,6 @@ jobs:
       - name: Push metric to Prometheus
         run: |
           cat <<EOF | curl --data-binary @- http://13.233.214.176:9091/metrics/job/github_actions
-          # TYPE workflow_run_total counter
+         
           workflow_run_total 1
           EOF
