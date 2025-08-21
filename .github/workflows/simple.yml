@@ -17,7 +17,7 @@ jobs:
 
       - name: Push metric to Prometheus
         run: |
-          # Just send a "1" to Prometheus to show workflow ran
-          curl -X POST \
-            --data "workflow_run_total 1" \
-            http://13.233.214.176:9091/metrics/job/github_actions
+          cat <<EOF | curl --data-binary @- http://13.233.214.176:9091/metrics/job/github_actions
+          # TYPE workflow_run_total counter
+          workflow_run_total 1
+          EOF
