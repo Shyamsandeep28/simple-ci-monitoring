@@ -1,23 +1,24 @@
-name: Simple CI Workflow
+name: API Fetch Demo
 
-on:
-  push:
-    branches: [ main ]
+on: [workflow_dispatch]   # Manually trigger the workflow
 
 jobs:
-  simple-job:
+  fetch-api-data:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run a simple script
-        run: echo "Hello, this is a simple workflow running at $(date)"
-
-      - name: Push metric to Prometheus
+      - name: Step 1 - Call GitHub API
+        id: apicall
         run: |
-          cat <<EOF | curl --data-binary @- http://13.233.214.176:9091/metrics/job/github_actions
-         
-          workflow_run_total 1
-          EOF
+          # Fetch latest GitHub Actions runner release info
+          response=$(curl -s https://api.github.com/repos/actions/runner/releases/latest)
+          echo "Full API Response:"
+          echo "$response"
+          
+          # Extract the release tag (like v2.320.0) using jq
+          version=$(echo "$response" | jq -r '.tag_name')
+          
+          # Store the value so next step can use it
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Step 2 - Use the API data
+        run: echo "✅ The latest GitHub Actions Runner version is ${{ steps.apicall.outputs.version }}"
